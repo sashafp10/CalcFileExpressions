@@ -15,10 +15,17 @@ or
 `private readonly IExpressionEvaluator _expressionEvaluator = new ScreenCalcExpressionEvaluator();`
 
 
-DI to be added.
-
-
 # Run
 Before using of calculator interaction please run it and make sure if it is in the basic view.
 Also **0** should be on the calculator screen.
 
+# Extensibility
+It is possible to use any evaluation engine, any parsing expressions engine
+
+# Future steps
+- DI to be added.
+- More tests
+
+
+# Notes
+It was an option to use ETL-pattern but it looks too complicated here
