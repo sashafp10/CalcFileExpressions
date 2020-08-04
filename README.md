@@ -8,11 +8,11 @@ In code you can find several implementations of the interfaces - it's just for e
 
 For example you can use:
 
-private IExpressionEvaluator _expressionEvaluator = new SilentExpressionEvaluator();
+`private IExpressionEvaluator _expressionEvaluator = new SilentExpressionEvaluator();`
 
 or
 
-private readonly IExpressionEvaluator _expressionEvaluator = new ScreenCalcExpressionEvaluator();
+`private readonly IExpressionEvaluator _expressionEvaluator = new ScreenCalcExpressionEvaluator();`
 
 
 DI to be added.
