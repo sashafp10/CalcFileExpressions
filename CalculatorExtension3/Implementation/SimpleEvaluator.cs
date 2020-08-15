@@ -1,55 +1,102 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 using CalculatorExtension3.Abstractions;
+using NUnit.Framework;
 
 namespace CalculatorExtension3.Implementation
 {
     public class SimpleEvaluator: IEvaluator
     {
         private readonly Regex _rexRightBracket = new Regex(@"([^\)])*[\)]{1}");
-        private readonly Regex _rexP1 = new Regex(@"([m\d)]+)[/*]([m\d]+)");
-        private readonly Regex _rexP2 = new Regex(@"([m\d)]+)[+-]([m\d]+)");
-        //private IExpressionEvaluator _expressionEvaluator = new SilentExpressionEvaluator();
-        private readonly IExpressionEvaluator _expressionEvaluator = new ScreenCalcExpressionEvaluator();
+        
+        /// <summary>
+        /// Regexp for priority 1 operations
+        /// </summary>
+        private readonly Regex _rexP1 = new Regex(@"([\d.,m]+)[ ]*[*/]{1}[ ]*([\d.,m]+)");
+
+        /// <summary>
+        /// Regexp for priority 1 operations
+        /// </summary>
+        private readonly Regex _rexP2 = new Regex(@"([\d.,m]+)[ ]*[+-]{1}[ ]*([\d.,m]+)");
+        private readonly IExpressionEvaluator _expressionEvaluator = null;
+        public IProgressReporter _progressReporter = new InfiniteInPlaceProgressReporter();
 
         private string _expression;
+        private bool _isProgressWorks = true;
+
+        public SimpleEvaluator()
+        {
+            //TODO: remove after DI
+            _expressionEvaluator = new ScreenCalcExpressionEvaluator();
+        }
+        
+        public SimpleEvaluator(IExpressionEvaluator evaluator)
+        {
+            _expressionEvaluator = evaluator;
+        }
+
         public decimal Evaluate(string expression)
         {
             expression = PrepareExpression(expression);
             _expression = expression.Replace(" ","");
-            int step = 0;
-            var cl = Console.CursorLeft;
+            //int step = 0;
+            _progressReporter.Start();
             while (Next())
             {
-                if (++step > 1)
-                    Console.CursorLeft -= 1;
-
-                switch (step % 4)
-                {
-                    case 0:
-                        Console.Write("/");
-                        break;
-                    case 1:
-                        Console.Write("-");
-                        break;
-                    case 2:
-                        Console.Write("\\");
-                        break;
-                    case 3:
-                        Console.Write("|");
-                        break;
-                }
-                
+                //ShowProgress(++step);
+                _progressReporter.Step(1);
             }
 
-            if (cl < Console.CursorLeft)
-                Console.CursorLeft -= 1;
+            _progressReporter.Stop();
+
+            //It's better to create injectable progress display but for the speed I wrote this one which is a
+            //if (_isProgressWorks && step > 0)
+            //    Console.CursorLeft -= 1;
 
             var res = EvaluateNoBrackets(_expression);
             //Console.WriteLine($"Final: {res}");
 
             return res;
         }
+
+        
+        //private void ShowProgress(int step)
+        //{
+        //    if (step == 1)
+        //        _isProgressWorks = true;
+
+        //    if (_isProgressWorks)
+        //    {
+        //        try
+        //        {
+        //            var ct = Console.CursorLeft;
+
+        //            if (step > 1)
+        //                Console.CursorLeft -= 1;
+
+        //            switch (step % 4)
+        //            {
+        //                case 0:
+        //                    Console.Write("/");
+        //                    break;
+        //                case 1:
+        //                    Console.Write("-");
+        //                    break;
+        //                case 2:
+        //                    Console.Write("\\");
+        //                    break;
+        //                case 3:
+        //                    Console.Write("|");
+        //                    break;
+        //            }
+        //        }
+        //        catch (Exception)
+        //        {
+        //            _isProgressWorks = false;
+        //        }
+        //    }
+        //}
 
         private string PrepareExpression(string expression)
         {
@@ -89,6 +136,7 @@ namespace CalculatorExtension3.Implementation
             bool moreSteps;
             do
             {
+                expr = PrepareExpression(expr);
                 //Console.Write($"EvaluateNoBrackets: {expr} => ");
                 Match m = _rexP1.Match(expr);
                 if (m.Success)
@@ -100,8 +148,6 @@ namespace CalculatorExtension3.Implementation
                         expr = EvaluateBasicExpressionAndReplace(expr, m);
                 }
 
-                //Console.Write($"{expr} => ");
-                expr = PrepareExpression(expr);
                 //Console.WriteLine(expr);
 
                 moreSteps = m.Success;
