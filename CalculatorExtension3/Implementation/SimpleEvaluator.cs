@@ -40,63 +40,19 @@ namespace CalculatorExtension3.Implementation
         {
             expression = PrepareExpression(expression);
             _expression = expression.Replace(" ","");
-            //int step = 0;
             _progressReporter.Start();
             while (Next())
             {
-                //ShowProgress(++step);
                 _progressReporter.Step(1);
             }
 
             _progressReporter.Stop();
-
-            //It's better to create injectable progress display but for the speed I wrote this one which is a
-            //if (_isProgressWorks && step > 0)
-            //    Console.CursorLeft -= 1;
 
             var res = EvaluateNoBrackets(_expression);
             //Console.WriteLine($"Final: {res}");
 
             return res;
         }
-
-        
-        //private void ShowProgress(int step)
-        //{
-        //    if (step == 1)
-        //        _isProgressWorks = true;
-
-        //    if (_isProgressWorks)
-        //    {
-        //        try
-        //        {
-        //            var ct = Console.CursorLeft;
-
-        //            if (step > 1)
-        //                Console.CursorLeft -= 1;
-
-        //            switch (step % 4)
-        //            {
-        //                case 0:
-        //                    Console.Write("/");
-        //                    break;
-        //                case 1:
-        //                    Console.Write("-");
-        //                    break;
-        //                case 2:
-        //                    Console.Write("\\");
-        //                    break;
-        //                case 3:
-        //                    Console.Write("|");
-        //                    break;
-        //            }
-        //        }
-        //        catch (Exception)
-        //        {
-        //            _isProgressWorks = false;
-        //        }
-        //    }
-        //}
 
         private string PrepareExpression(string expression)
         {
