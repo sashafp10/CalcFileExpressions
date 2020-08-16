@@ -74,7 +74,7 @@ namespace CalculatorExtension3.Implementation
 
             _calcWindow = AutomationElement.RootElement.FindFirst(
                 TreeScope.Children,
-                new PropertyCondition(AutomationElement.NameProperty, "Calculator"));
+                new PropertyCondition(AutomationElement.NameProperty, System.Configuration.ConfigurationManager.AppSettings["CalcName"]));
 
             if (_calcWindow == null)
                 throw new NullReferenceException("Calculator is not opened. Please run windows calculator and run again.");

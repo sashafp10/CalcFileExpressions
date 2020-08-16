@@ -15,9 +15,10 @@ or
 `private readonly IExpressionEvaluator _expressionEvaluator = new ScreenCalcExpressionEvaluator();`
 
 
-# Run
-Before using of calculator interaction please run it and make sure if it is in the basic view.
-Also **0** should be on the calculator screen.
+# Run app prerequisites
+- Before using of calculator interaction please run it and make sure if it is in the basic view.
+- **0** should be on the calculator screen.
+- In the App.config, set "CalcName" to be equal to a caption on the your calculator's window 
 
 # Extensibility
 It is possible to use any evaluation engine, any parsing expressions engine
@@ -25,7 +26,15 @@ It is possible to use any evaluation engine, any parsing expressions engine
 # Future steps
 - DI to be added.
 - More tests
+- Automatically choose calculator type
+- Replace regex parsing with a proper grammar parsing (see BNF)
+- Maybe graphic recognition feature for handling calc
 
 
 # Notes
 It was an option to use ETL-pattern but it looks too complicated here
+
+# Changelog
+**v. 1.0.1.0** - Added support of a Windows 10 calculator. See *ScreenMetroCalcExpressionEvaluator*
+
+

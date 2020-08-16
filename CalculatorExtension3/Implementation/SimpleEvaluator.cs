@@ -28,7 +28,9 @@ namespace CalculatorExtension3.Implementation
         public SimpleEvaluator()
         {
             //TODO: remove after DI
-            _expressionEvaluator = new ScreenCalcExpressionEvaluator();
+            //_expressionEvaluator = new ScreenCalcExpressionEvaluator();
+            _expressionEvaluator = new ScreenMetroCalcExpressionEvaluator();
+            //_expressionEvaluator = new SilentExpressionEvaluator();
         }
         
         public SimpleEvaluator(IExpressionEvaluator evaluator)
@@ -49,7 +51,7 @@ namespace CalculatorExtension3.Implementation
             _progressReporter.Stop();
 
             var res = EvaluateNoBrackets(_expression);
-            //Console.WriteLine($"Final: {res}");
+            Debug.WriteLine($"Final: {res}");
 
             return res;
         }
@@ -61,6 +63,9 @@ namespace CalculatorExtension3.Implementation
             {
                 expr = expr.Replace($"{operation.Sign}-", $"{operation.Sign}m");
             }
+
+            if (expr[0] == '-')
+                expr = $"m{expr.Substring(1)}";
 
             return expr.Replace("(-", "(m");
         }
@@ -78,9 +83,9 @@ namespace CalculatorExtension3.Implementation
                 var res = EvaluateNoBrackets(expr1);
                 var e = _expression;
                 _expression = $"{_expression.Substring(0, idx)}{res}{_expression.Substring(idx + 2 + expr1.Length)}";
-                //Console.Write($"Next: {e}   ->   {_expression}   ->   ");
+                Debug.Write($"Next: {e}   ->   {_expression}   ->   ");
                 _expression = PrepareExpression(_expression);
-                //Console.WriteLine(_expression);
+                Debug.WriteLine(_expression);
                 return true;
             }
 
@@ -93,7 +98,7 @@ namespace CalculatorExtension3.Implementation
             do
             {
                 expr = PrepareExpression(expr);
-                //Console.Write($"EvaluateNoBrackets: {expr} => ");
+                Debug.Write($"EvaluateNoBrackets: {expr} => ");
                 Match m = _rexP1.Match(expr);
                 if (m.Success)
                     expr = EvaluateBasicExpressionAndReplace(expr, m);
@@ -104,10 +109,13 @@ namespace CalculatorExtension3.Implementation
                         expr = EvaluateBasicExpressionAndReplace(expr, m);
                 }
 
-                //Console.WriteLine(expr);
+                Debug.WriteLine(expr);
 
                 moreSteps = m.Success;
             } while (moreSteps);
+
+            if (expr[0] == 'm')
+                expr = $"-{expr.Substring(1)}";
 
             var res = decimal.Parse(expr);
 

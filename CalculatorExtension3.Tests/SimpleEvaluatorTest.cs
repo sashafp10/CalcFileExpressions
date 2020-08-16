@@ -24,6 +24,7 @@ namespace CalculatorExtension3.Tests
         [TestCase("5-5 /100", 4.95)]
         [TestCase("(5-5) /100", 0)]
         [TestCase("(5-50) /5", -9)]
+        [TestCase("34+22-3332+1", -3275)]
         public void EvaluateTests(string exprString, decimal expected)
         {
             var res = _se.Evaluate(exprString);
