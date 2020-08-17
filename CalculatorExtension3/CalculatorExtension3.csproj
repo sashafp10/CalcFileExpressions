@@ -67,6 +67,7 @@
     <Compile Include="Implementation\FileExpressionsReader.cs" />
     <Compile Include="Implementation\HardcodedExpressionsReader.cs" />
     <Compile Include="Implementation\InfiniteInPlaceProgressReporter.cs" />
+    <Compile Include="Implementation\BaseScreenCalcExpressionEvaluator.cs" />
     <Compile Include="Implementation\ScreenCalcExpressionEvaluator.cs" />
     <Compile Include="Implementation\ScreenMetroCalcExpressionEvaluator.cs" />
     <Compile Include="Implementation\SilentExpressionEvaluator.cs" />

@@ -1,21 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
-using System.Threading;
 using System.Windows.Automation;
-using CalculatorExtension3.Abstractions;
 
 namespace CalculatorExtension3.Implementation
 {
-    public class ScreenMetroCalcExpressionEvaluator : IExpressionEvaluator
+    public class ScreenMetroCalcExpressionEvaluator : BaseScreenCalcExpressionEvaluator
     {
-        private AutomationElement _calcWindow;
-        private readonly Dictionary<string, InvokePattern> _buttons = new Dictionary<string, InvokePattern>();
         private AutomationElement _input;
-        private const int _delay = 300;
-        private readonly Regex _numbersRex = new Regex(@"([\d]+)");
+        //private readonly Regex _numbersRex = new Regex(@"([\d]+)");
 
         //[DllImport("USER32.DLL", CharSet = CharSet.Unicode)]
         //public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
@@ -24,84 +17,42 @@ namespace CalculatorExtension3.Implementation
         //[DllImport("USER32.DLL")]
         //public static extern bool SetForegroundWindow(IntPtr hWnd);
 
-        public ScreenMetroCalcExpressionEvaluator()
+        //public ScreenMetroCalcExpressionEvaluator(): base()
+        //{
+        //    // Get a handle to the Calculator application. The window class 
+        //    // and window name were obtained using the Spy++ tool.
+
+        //    //Here is one more method for working with a calc. It's more common but I am not sure which one is preferable
+        //    //IntPtr calculatorHandle = FindWindow("ApplicationFrameWindow", "Калькулятор");
+
+        //    // Verify that Calculator is a running process. 
+        //    //if (calculatorHandle == IntPtr.Zero)
+        //    //{
+        //    //    Console.WriteLine("Calculator is not running.");
+        //    //    return;
+        //    //}
+
+        //    //// Make Calculator the foreground application and send it  
+        //    //// a set of calculations.
+        //    //SetForegroundWindow(calculatorHandle);
+        //    //SendKeys.SendWait("111");
+        //    //SendKeys.SendWait("*");
+        //    //SendKeys.SendWait("11");
+        //    //SendKeys.SendWait("=");
+        //    //SendKeys.SendWait("Ctrl+C");
+        //    //Console.WriteLine($"Clipboard.GetText(): {Clipboard.GetText()}");
+        //    //DiscoverCalc();
+        //}
+
+
+        protected override decimal GetResultingValue()
         {
-            // Get a handle to the Calculator application. The window class 
-            // and window name were obtained using the Spy++ tool.
-
-            //Here is one more method for working with a calc. It's more common but I am not sure which one is preferable
-            //IntPtr calculatorHandle = FindWindow("ApplicationFrameWindow", "Калькулятор");
-
-            // Verify that Calculator is a running process. 
-            //if (calculatorHandle == IntPtr.Zero)
-            //{
-            //    Console.WriteLine("Calculator is not running.");
-            //    return;
-            //}
-
-            //// Make Calculator the foreground application and send it  
-            //// a set of calculations.
-            //SetForegroundWindow(calculatorHandle);
-            //SendKeys.SendWait("111");
-            //SendKeys.SendWait("*");
-            //SendKeys.SendWait("11");
-            //SendKeys.SendWait("=");
-            //SendKeys.SendWait("Ctrl+C");
-            //Console.WriteLine($"Clipboard.GetText(): {Clipboard.GetText()}");
-            DiscoverCalc();
-        }
-
-        public decimal Evaluate(BasicMathExpression expression)
-        {
-            Clear();
-
-            //left
-            if (expression.Left.StartsWith("-") || expression.Left.StartsWith("m"))
-            {
-                EnterNumber(expression.Left.Substring(1));
-                _buttons["m"].Invoke();
-                Thread.Sleep(_delay);
-            } else
-                EnterNumber(expression.Left);
-
-            //operation
-            _buttons[expression.Operation.Sign].Invoke();
-            Thread.Sleep(_delay);
-
-            //reght
-            if (expression.Right.StartsWith("-") || expression.Right.StartsWith("m"))
-            {
-                EnterNumber(expression.Right.Substring(1));
-                _buttons["m"].Invoke();
-                Thread.Sleep(_delay);
-            }
-            else
-                EnterNumber(expression.Right);
-
-            _buttons["="].Invoke();
-            Thread.Sleep(_delay);
-
             var resStr = GetResultText();
             var res = decimal.Parse(resStr);
             return res;
         }
 
-        public void Clear()
-        {
-            _buttons["Clear"].Invoke();
-            Thread.Sleep(_delay);
-        }
-
-        private void EnterNumber(string value)
-        {
-            foreach (char c in value)
-            {
-                _buttons[c.ToString()].Invoke();
-                Thread.Sleep(_delay);
-            }
-        }
-
-        private void DiscoverCalc()
+        protected override void DiscoverCalc()
         {
             //TODO: akolyada: test calc discovery
             

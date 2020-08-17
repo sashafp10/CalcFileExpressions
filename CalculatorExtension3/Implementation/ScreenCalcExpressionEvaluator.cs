@@ -1,74 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Windows.Automation;
-using CalculatorExtension3.Abstractions;
 
 namespace CalculatorExtension3.Implementation
 {
-    public class ScreenCalcExpressionEvaluator : IExpressionEvaluator
+    public class ScreenCalcExpressionEvaluator : BaseScreenCalcExpressionEvaluator
     {
-        private AutomationElement _calcWindow;
-        private readonly Dictionary<string, InvokePattern> _buttons = new Dictionary<string, InvokePattern>();
         private AutomationElement _input;
-        private const int _delay = 300;
 
-        public ScreenCalcExpressionEvaluator()
+        protected override decimal GetResultingValue()
         {
-            DiscoverCalc();
-        }
-
-        public decimal Evaluate(BasicMathExpression expression)
-        {
-            Clear();
-
-            //left
-            if (expression.Left.StartsWith("-") || expression.Left.StartsWith("m"))
-            {
-                EnterNumber(expression.Left.Substring(1));
-                _buttons["m"].Invoke();
-                Thread.Sleep(_delay);
-            } else
-                EnterNumber(expression.Left);
-
-            //operation
-            _buttons[expression.Operation.Sign].Invoke();
-            Thread.Sleep(_delay);
-
-            //reght
-            if (expression.Right.StartsWith("-") || expression.Right.StartsWith("m"))
-            {
-                EnterNumber(expression.Right.Substring(1));
-                _buttons["m"].Invoke();
-                Thread.Sleep(_delay);
-            }
-            else
-                EnterNumber(expression.Right);
-
-            _buttons["="].Invoke();
-            Thread.Sleep(_delay);
-
             var resStr = _input.GetText();
             var res = decimal.Parse(resStr);
             return res;
         }
 
-        public void Clear()
-        {
-            _buttons["Clear"].Invoke();
-            Thread.Sleep(_delay);
-        }
-
-        private void EnterNumber(string value)
-        {
-            foreach (char c in value)
-            {
-                _buttons[c.ToString()].Invoke();
-                Thread.Sleep(_delay);
-            }
-        }
-
-        private void DiscoverCalc()
+        protected override void DiscoverCalc()
         {
             //TODO: akolyada: test calc discovery
 
